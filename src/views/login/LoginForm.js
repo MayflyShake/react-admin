@@ -1,10 +1,15 @@
 import React, { Component, Fragment } from 'react';
-
+import {withRouter} from 'react-router-dom';
 import "./index.scss"
-import { Form, Input, Button, Row, Col,message } from 'antd';
+import { Form, Input, Button, Row, Col } from 'antd';
 import { UserOutlined, UnlockOutlined } from '@ant-design/icons';
-import {validate_password} from '../../utils/validate'
-import {Login,GetCode} from '../../api/account'
+import {validate_password} from '../../utils/validate';
+import {Login} from '../../api/account';
+import Code from '../../components/code/index';
+
+import CryptoJs from 'crypto-js'
+
+import {setToken} from '../../utils/session'
 
 class LoginForm extends Component {
 
@@ -12,43 +17,37 @@ class LoginForm extends Component {
         super();
         this.state = {
             username: "",
-            code_button_loading: false,
-            code_button_disabled:false,
-            code_button_text: "獲取驗證碼"
+            password:"",
+            code:"",
+            module:"login",
+            loading:false
         }
     }
 
     onFinish = values => {
-        Login().then(response => {
+        const requestData = {
+            username: this.state.username,
+            password:CryptoJs.MD5(this.state.password),
+            code:this.state.code
+        }
+        this.setState({
+            loading:true
+        })
+        Login(requestData).then(response => {
             console.log(response);
+            this.setState({
+                loading:false
+            })
+            const data = response.data.data;
+            setToken(data.token)
+            this.props.history.push('/index');
         }).catch(error => {
-
+            this.setState({
+                loading:false
+            })
         })
         console.log('Received values of form: ', values);
     };
-
-    getCode = () => {
-        if(!this.state.username){
-            message.warning("用戶名不能為空!",1);
-            return false;
-        }
-        this.setState({
-            code_button_loading:true,
-            code_button_text: "發送中"
-        })
-        const requestData = {
-            username: this.state.username,
-            module: "login"
-        }
-        GetCode(requestData).then(response => {
-            this.countDown();
-        }).catch(error => {
-            this.setState({
-                code_button_loading:false,
-                code_button_text: "重新獲取"
-            })
-        })
-    }
 
     inputChange = (e) => {
         let value = e.target.value;
@@ -57,29 +56,18 @@ class LoginForm extends Component {
         })
     }
 
-    countDown = () => {
-        let timer = null;
-        let sec = 5;
+    inputChangeP = (e) => {
+        let value = e.target.value;
         this.setState({
-            code_button_loading:false,
-            code_button_disabled:true,
-            code_button_text: `${sec}S`
+            password: value
         })
-        timer = setInterval(() => {
-            sec--;
-            if(sec <= 0){
-                this.setState({
-                    code_button_text:"重新獲取",
-                    code_button_disabled:false
-                })
-                clearInterval(timer);
-                return false;
-            }
-            this.setState({
-                code_button_text:`${sec}S`
-            })
-        },1000)
-        
+    }
+
+    inputChangeC = (e) => {
+        let value = e.target.value;
+        this.setState({
+            code: value
+        })
     }
 
     toggleForm = () => {
@@ -87,7 +75,7 @@ class LoginForm extends Component {
     }
 
     render() {
-        const { username,code_button_loading,code_button_text,code_button_disabled} = this.state;
+        const { username,module,loading} = this.state;
         // const _this = this;
         return (
 
@@ -105,7 +93,7 @@ class LoginForm extends Component {
                     >
                         <Form.Item
                             name="username"
-                            rules={[{ required: true, message: '郵箱不能為空' }, { type: "email", message: '郵箱格式不正確' },
+                            rules={[{ required: true, message: '郵箱不能為空' }, { type: "email", message: '郵箱格式不正確' }
                             // ({ getFieldValue }) => ({
                             //         validator(rule, value) {
                             //           if (validate_email(value)) {
@@ -138,7 +126,7 @@ class LoginForm extends Component {
                                 // { max: 20, message: '不能大於20位' }
                             ]}
                         >
-                            <Input prefix={<UnlockOutlined className="site-form-item-icon" />} placeholder="字母+數字,大於6位 小於20位" />
+                            <Input type="password" onChange={this.inputChangeP} prefix={<UnlockOutlined className="site-form-item-icon" />} placeholder="字母+數字,大於6位 小於20位" />
                         </Form.Item>
                         <Form.Item
                             name="code"
@@ -146,15 +134,15 @@ class LoginForm extends Component {
                         >
                             <Row gutter={13}>
                                 <Col span={15}>
-                                    <Input prefix={<UnlockOutlined className="site-form-item-icon" />} placeholder="Code" />
+                                    <Input onChange={this.inputChangeC} prefix={<UnlockOutlined className="site-form-item-icon" />} placeholder="Code" />
                                 </Col>
                                 <Col span={9}>
-                        <Button type="danger" loading={code_button_loading} block disabled={code_button_disabled} onClick={this.getCode}>{code_button_text}</Button>
+                                    <Code username={username} module={module}/>
                                 </Col>
                             </Row>
                         </Form.Item>
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" className="login-form-button" block>登錄</Button>
+                            <Button type="primary" htmlType="submit" loading={loading} className="login-form-button" block>登錄</Button>
                         </Form.Item>
                     </Form>
                 </div>
@@ -163,4 +151,4 @@ class LoginForm extends Component {
     }
 }
 
-export default LoginForm;
+export default withRouter(LoginForm);

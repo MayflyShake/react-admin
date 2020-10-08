@@ -1,0 +1,46 @@
+.logo{
+    float: left;
+    width: 250px;
+    height: 75px;
+    align-items: center;
+    margin-left: -50px;
+    justify-content: center;
+    background-color: #001529;
+    -webkit-transition: all .25s ease 0s;
+    -moz-transition: all .25s ease 0s;
+    -ms-transition: all .25s ease 0s;
+    -o-transition: all .25s ease 0s;
+    transition: all .25s ease 0s;
+    span{
+        display: block;
+        width: 177px;
+        height: 47px;
+        background-color: #1a2d3f;
+    }
+}
+
+.collapsed-close{
+    .logo{
+        width: 80px;
+        span{
+            width: 100%;
+        }
+    }
+    .header-wrap{
+        margin-left: 65px;
+    }
+}
+
+.header-wrap{
+    -webkit-transition: all .25s ease 0s;
+    -moz-transition: all .25s ease 0s;
+    -ms-transition: all .25s ease 0s;
+    -o-transition: all .25s ease 0s;
+    transition: all .25s ease 0s;
+    margin-left: 220px;
+}
+
+.collapsed-icon{
+    font-size: 24px;
+    cursor: pointer;
+}

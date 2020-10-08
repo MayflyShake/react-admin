@@ -1,0 +1,50 @@
+const router = [
+    {
+        title:"控制台",
+        icon:"index",
+        key:"/index"
+    },
+    {
+        title:"用戶管理",
+        icon:"laptop",
+        key:"/index/user",
+        child:[
+            {key:"/index/user/list",title:"用戶列表",icon:''},
+            {
+                key:"/index/user/add",
+                title:"添加用戶",
+                icon:''
+            }
+        ]
+    },
+    {
+        title:"部門管理",
+        icon:"bars",
+        key:"/index/department",
+        child:[
+            {key:"/index/department/list",title:"部門列表",icon:''},
+            {key:"/index/department/add",title:"添加部門",icon:''}
+        ]
+    },
+    {
+        title:"職位管理",
+        icon:"edit",
+        key:"/home/entry",
+        child:[
+            {key:"/home/entry/form/basic-form",title:"職位列表",icon:''},
+            {key:"/home/entry/form/step-form",title:"添加職位",icon:''}
+        ]
+    },
+    {
+        title:"請假",
+        icon:"info-cicle-o",
+        key:"/home/about"
+    },
+    {
+        title:"加班",
+        icon:"info-cicle-o",
+        key:"/home/abouta"
+    }
+]
+
+export default router;
